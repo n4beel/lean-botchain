@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#E6FFFA"/>
+  <!-- Central Fulcrum Axis -->
+  <line x1="16" y1="6" x2="16" y2="26" stroke="#06292E" stroke-width="2" stroke-linecap="round"/>
+  <!-- Tilting Scale Beam (2deg tilt) -->
+  <line x1="6" y1="18" x2="26" y2="14" stroke="#FF4D6D" stroke-width="3" stroke-linecap="round"/>
+  <!-- Fulcrum Diamond -->
+  <rect x="13.5" y="13.5" width="5" height="5" transform="rotate(45 16 16)" fill="#06292E"/>
+  <!-- Weight Indicator (Left/Right) -->
+  <circle cx="8" cy="17.6" r="2.5" fill="#FF4D6D"/>
+  <circle cx="24" cy="14.4" r="2" fill="#06292E"/>
+</svg>

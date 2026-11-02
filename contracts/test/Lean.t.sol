@@ -397,6 +397,34 @@ contract LeanTest is Test {
         vm.expectRevert(Lean.BadDuration.selector);
         lean.create("Question?", sampleOptions, 7776001);
 
+        // Exact boundary successes
+        // 1. Exactly 120 chars question
+        bytes memory q120 = new bytes(120);
+        for (uint256 i = 0; i < 120; i++) q120[i] = "a";
+        uint256 id120 = lean.create(string(q120), sampleOptions, 86400);
+        assertEq(id120, 1);
+
+        // 2. Exactly 2 options
+        string[] memory twoOpts = new string[](2);
+        twoOpts[0] = "Opt 1";
+        twoOpts[1] = "Opt 2";
+        uint256 idTwo = lean.create("Two options?", twoOpts, 86400);
+        assertEq(idTwo, 2);
+
+        // 3. Exactly 6 options
+        string[] memory sixOpts = new string[](6);
+        for (uint256 i = 0; i < 6; i++) sixOpts[i] = "Option";
+        uint256 idSix = lean.create("Six options?", sixOpts, 86400);
+        assertEq(idSix, 3);
+
+        // Leader on invalid poll id
+        (uint8 b0, bool t0) = lean.leader(0);
+        assertEq(b0, 0);
+        assertTrue(t0);
+        (uint8 b9, bool t9) = lean.leader(999);
+        assertEq(b9, 0);
+        assertTrue(t9);
+
         // Create valid poll
         uint256 id = lean.create("Valid Poll", sampleOptions, 86400);
 
@@ -415,13 +443,20 @@ contract LeanTest is Test {
     }
 
     function test_LatestView() public {
-        for (uint256 i = 0; i < 5; i++) {
-            lean.create("Q", sampleOptions, 86400);
+        for (uint256 i = 1; i <= 5; i++) {
+            lean.create(string.concat("Q", vm.toString(i)), sampleOptions, 86400);
         }
         assertEq(lean.pollCount(), 5);
 
         Lean.Poll[] memory recents = lean.latest(0, 3);
         assertEq(recents.length, 3);
+        assertEq(recents[0].question, "Q5");
+
+        // Non-zero offset: offset 2, count 2 (should return Q3, Q2)
+        Lean.Poll[] memory offsetList = lean.latest(2, 2);
+        assertEq(offsetList.length, 2);
+        assertEq(offsetList[0].question, "Q3");
+        assertEq(offsetList[1].question, "Q2");
 
         Lean.Poll[] memory emptyList = lean.latest(10, 5);
         assertEq(emptyList.length, 0);
